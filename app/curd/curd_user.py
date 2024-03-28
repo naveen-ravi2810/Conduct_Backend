@@ -91,9 +91,7 @@ async def show_user_profile(user_id: int, session: AsyncSession):
         else:
             raise ValueError("User Not found")
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 
 async def send_otp_to_email_for_register(

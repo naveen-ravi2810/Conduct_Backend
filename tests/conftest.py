@@ -2,9 +2,7 @@ from fastapi.testclient import TestClient
 from collections.abc import Generator
 import pytest
 
-from .utils.utils import (
-    get_user_token_headers
-)
+from .utils.utils import get_user_token_headers
 from main import app
 
 

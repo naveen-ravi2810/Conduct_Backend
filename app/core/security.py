@@ -20,7 +20,7 @@ def check_password(password: str, hashed_password: str):
     )
 
 
-async def create_access_token(id: str, email: str):
+async def create_access_token(id: int, email: str):
     ist = timezone("Asia/Kolkata")
     iat = datetime.now(ist)
     exp = iat + timedelta(seconds=settings.JWT_EXPIRE_TIME_IN_SEC)
