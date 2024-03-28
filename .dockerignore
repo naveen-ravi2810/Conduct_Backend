@@ -1,0 +1,4 @@
+.dockerfile
+.env
+.ruff_cache
+__pycache__
