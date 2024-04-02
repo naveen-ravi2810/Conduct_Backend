@@ -4,6 +4,7 @@ services:
 
   api:
     build:
+      context: .
       dockerfile: Dockerfile
       args:
         - POSTGRESQL_URI=${POSTGRESQL_URI}
@@ -21,60 +22,71 @@ services:
         - CELERY_BACKEND=${CELERY_BACKEND}
         - CELERY_BROKER=${CELERY_BROKER}
     container_name: app
-    command:
-      - "poetry"
-      - "run"
-      - "uvicorn"
-      - "main:app"
-      - "--host=0.0.0.0"
-      - "--port=8000"
+    command: bash -c "poetry run alembic upgrade head && poetry run uvicorn main:app --host=0.0.0.0 --port=8000"
     restart: always
     ports:
       - "8000:8000"
     depends_on:
       - postgres
       - redis
-
+    networks:
+      - app_network
 
 
   postgres:
     image: postgres:14-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     environment:
       - POSTGRES_PASSWORD=tiger
-      - POSTGRES_USER=postgresql
+      - POSTGRES_USER=postgres
       - POSTGRES_DB=Conduct
+    networks:
+      - app_network
+
 
   redis:
-    image: redis:latest@sha256:a7cee7c8178ff9b5297cb109e6240f5072cdaaafd775ce6b586c3c704b06458e
+    image: redis:latest
     container_name: redis
     restart: always
     ports:
       - "6379:6379"
+    networks:
+      - app_network
+
 
   worker:
-    env_file:
-      - .env
     build:
+      context: .
       dockerfile: Dockerfile
     container_name: worker
-    command: celery -A app.celery_worker worker -l info
+    command: "poetry run celery -A app.celery_worker worker -l info"
     restart: always
     depends_on:
       - redis
+      - api
+
 
   flower:
-    env_file:
-      - .env
     build:
+      context: .
       dockerfile: Dockerfile
     container_name: flower
-    command: celery -A app.celery_worker flower -l info --port=5555
+    command: "poetry run celery -A app.celery_worker flower -l info --port=5555"
     restart: always
     depends_on:
       - redis
       - worker
+      - api
     ports:
       - "5555:5555"
 
+
+volumes:
+  postgres_data:
+
+
+networks:
+  app_network:

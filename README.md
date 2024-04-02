@@ -1,5 +1,7 @@
 # The Conduct Application
 
+<b><h1>Info</h1></b>
+application that engages the students by searching their skills
 
 ## STEPS:
 
@@ -12,13 +14,9 @@ Need to configure some details from .env file
 
     cp .env.example .env
 
-Build the image
+Build the image and Run Container
 
-    docker build  -t conduct .
-
-Run the Image
-
-    docker run -p8000:8000 <image-id (or) conduct>
+    docker compose up
 
 You can see it in localhost:8000
 
@@ -27,9 +25,29 @@ and read the docs at
 <a href='http://localhost:8000/docs'>http://localhost:8000/docs</a>
 
 
-User Complete
+## Tech stack
 
+   - FastAPI
+   - SQLModel (sqlalchemy and pydantic)
+   - alembic
+   - PostgreSQL
+   - Redis
+   - Celery
+   - FastAPI_Pagination
+   - Pytest
+   - pydantic_settings
+   - smtp
+   - bcrypt
+   - pyjwt
 
+## Related Images
+<img src="./Assets/Docs_Page1.png"/>
+ <hr/>
+<img src="./Assets/Docs_Page2.png"/>
+
+## And has a well test functions with result 
+
+<img src="./Assets/Test_Result.png"/>
 
 ### Errors and Learnings
 `errors that i rectified`
@@ -37,4 +55,13 @@ User Complete
 1. Writing pytest
     1. Use case of scope
     2. How to yield client
+2. Making the Sync API to Async API
+3. Writing Dockerfile and docker-compose.yml  
+4. Know more about FastAPI_Pagination
+   1. Wonder full module to make the pagination good 
+5. Writing Makefile for better CI/CD <i>will implement soon</i> 
 
+
+## End 
+
+1. Written an article and hosted in onrender.com <a href='https://naveenraviblogs.onrender.com/' target='_blank'>Link</a>. 
