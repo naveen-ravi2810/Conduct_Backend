@@ -1,0 +1,80 @@
+version: "3.8"
+
+services:
+
+  api:
+    build:
+      dockerfile: Dockerfile
+      args:
+        - POSTGRESQL_URI=${POSTGRESQL_URI}
+        - REDIS_HOST=${REDIS_HOST}
+        - REDIS_PORT=${REDIS_PORT}
+        - REDIS_PASSWORD=${REDIS_PASSWORD}
+        - REDIS_USER_NAME=${REDIS_USER_NAME}
+        - REDIS_DB=${REDIS_DB}
+        - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+        - JWT_ALGORITHM=${JWT_ALGORITHM}
+        - JWT_EXPIRE_IN_SEC=${JWT_EXPIRE_IN_SEC}
+        - DOMAIN_EMAIL=${DOMAIN_EMAIL}
+        - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+        - EMAIL_EMAIL=${EMAIL_EMAIL}
+        - CELERY_BACKEND=${CELERY_BACKEND}
+        - CELERY_BROKER=${CELERY_BROKER}
+    container_name: app
+    command:
+      - "poetry"
+      - "run"
+      - "uvicorn"
+      - "main:app"
+      - "--host=0.0.0.0"
+      - "--port=8000"
+    restart: always
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+
+
+
+  postgres:
+    image: postgres:14-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=tiger
+      - POSTGRES_USER=postgresql
+      - POSTGRES_DB=Conduct
+
+  redis:
+    image: redis:latest@sha256:a7cee7c8178ff9b5297cb109e6240f5072cdaaafd775ce6b586c3c704b06458e
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  worker:
+    env_file:
+      - .env
+    build:
+      dockerfile: Dockerfile
+    container_name: worker
+    command: celery -A app.celery_worker worker -l info
+    restart: always
+    depends_on:
+      - redis
+
+  flower:
+    env_file:
+      - .env
+    build:
+      dockerfile: Dockerfile
+    container_name: flower
+    command: celery -A app.celery_worker flower -l info --port=5555
+    restart: always
+    depends_on:
+      - redis
+      - worker
+    ports:
+      - "5555:5555"
+

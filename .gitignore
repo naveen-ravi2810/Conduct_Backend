@@ -1,0 +1,10 @@
+__pycache__
+.ruff_cache
+.pytest_cache
+log.txt
+.coverage
+**.idea/**
+errors.txt
+.idea
+requests.log
+.env

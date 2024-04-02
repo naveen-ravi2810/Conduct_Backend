@@ -1,0 +1,20 @@
+[MAIN]
+
+ignore-patterns=^\.#
+
+suggestion-mode=yes
+
+[MESSAGES CONTROL]
+
+disable=
+    missing-docstring, # Every files do not require the docstring
+    too-few-public-methods, # Because the sqlmodel classes do not have methods
+    C0301,  # Some f string line has more than the line length > 100
+    E0401,
+    E1102,
+    E1101,
+    R0913,
+    W0622,
+    W0707,
+    W0702,
+    C0103,
