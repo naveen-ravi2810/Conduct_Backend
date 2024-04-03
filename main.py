@@ -48,7 +48,7 @@ async def add_log(request: Request, call_next):
     response = await call_next(request)
     response_time = time.time() - start_time
     logging.info(
-        f"Request: {request_method} {request_url}, Response Time: {response_time}"
+        "Request: %s %s, Response Time: %s", request_method, request_url, response_time
     )
     response.headers["X-Time-Elapsed"] = str(response_time)[:6]
     return response

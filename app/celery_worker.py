@@ -2,8 +2,8 @@
 Celery worker file
 """
 
-from celery import Celery
 import logging
+from celery import Celery
 
 from app.utils import send_email, send_email_for_forgot_password
 from app.core.settings import settings
@@ -24,7 +24,7 @@ def send_otp(email: str, otp: str):
     try:
         send_email(email, otp)
     except Exception as e:  # pylint: disable=W0718
-        logger.exception(f"Failed to send OTP email to {email}: {e}")
+        logger.exception("Failed to send OTP email to %s: %s", email, e)
 
 
 @celery_app.task(name="Sending email for forgot password")
@@ -36,5 +36,5 @@ def send_otp_for_forgot_password(email: str, otp: str):
         send_email_for_forgot_password(email, otp)
     except Exception as e:  # pylint: disable=W0718
         logger.exception(
-            f"Failed to send OTP email for forgot password to {email}: {e}"
+            "Failed to send OTP email for forgot password to %s: %s", email, e
         )

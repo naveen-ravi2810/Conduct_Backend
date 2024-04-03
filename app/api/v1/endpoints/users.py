@@ -26,7 +26,9 @@ router = APIRouter()
 
 # To get the users data
 @router.get(
-    "/profile/{user_id}", status_code=status.HTTP_200_OK, response_model=ShowUserProfile
+    "/profile/{user_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=ShowUserProfile,
 )
 async def get_user_by_id(
     user_id: str,
@@ -40,7 +42,7 @@ async def get_user_by_id(
     return user
 
 
-# Sending profile uri for edit and hiding other informations
+# Sending profile uri for edit and hiding other information
 @router.get("/update_uri", status_code=status.HTTP_200_OK, response_model=UserURIUpdate)
 async def get_user_updates_uri_by_id(
     token_details: TokenResponse = Depends(get_user_credentials),
@@ -49,18 +51,17 @@ async def get_user_updates_uri_by_id(
     return await show_user_profile(user_id=token_details.id, session=session)
 
 
-# Get the users cedentials and return the valid token
+# Get the users credentials and return the valid token
 @router.post(
     "/login", status_code=status.HTTP_200_OK, response_model=LoginResponseSchema
 )
 async def login_user_by_credentials(
     user_details: LoginUser, session: AsyncSession = Depends(get_session)
 ):
-    return LoginResponseSchema(
-        access_token=await login_user(
-            user_details=user_details, session=session, r_conn=r_conn
-        )
+    access_token = await login_user(
+        user_details=user_details, session=session, r_conn=r_conn
     )
+    return LoginResponseSchema(access_token=access_token)
 
 
 # Once the user logout the token is removed from redis for the token secure purpose
