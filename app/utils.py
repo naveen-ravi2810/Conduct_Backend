@@ -1,5 +1,5 @@
 """
-utils folder containg
+utils folder contain
     send_email
     send_email_for_forgot_password
 """

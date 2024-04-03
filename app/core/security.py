@@ -26,14 +26,14 @@ async def create_access_token(id: str, email: str):
     exp = iat + timedelta(seconds=settings.JWT_EXPIRE_TIME_IN_SEC)
     return jwt.encode(
         {"sub": id, "email": email, "exp": exp, "iat": iat},
-        settings.JWT_SECERT_KEY,
+        settings.JWT_SECRET_KEY,
         settings.JWT_ALGORITHM,
     )
 
 
 async def decode_token(token: str):
     try:
-        payload = jwt.decode(token, settings.JWT_SECERT_KEY, settings.JWT_ALGORITHM)
+        payload = jwt.decode(token, settings.JWT_SECRET_KEY, settings.JWT_ALGORITHM)
         return payload
     except:
         return None
