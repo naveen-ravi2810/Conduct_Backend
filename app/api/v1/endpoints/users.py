@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import APIRouter, Depends, status, UploadFile, HTTPException
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -31,7 +33,7 @@ router = APIRouter()
     response_model=ShowUserProfile,
 )
 async def get_user_by_id(
-    user_id: str,
+    user_id: UUID,
     token_details: TokenResponse = Depends(get_user_credentials),
     session: AsyncSession = Depends(get_session),
 ):

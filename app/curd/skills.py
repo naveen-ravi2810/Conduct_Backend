@@ -1,4 +1,6 @@
 from typing import List
+from uuid import UUID
+
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel import select, col, desc, func
 from sqlalchemy.orm import selectinload
@@ -7,7 +9,7 @@ from fastapi import HTTPException
 from app.models import GetNewSkills, Skill, SkillsShow, Users, UserSkillLink
 
 
-async def get_user_skills_by_user_id(session: AsyncSession, user_id: int):
+async def get_user_skills_by_user_id(session: AsyncSession, user_id: UUID):
     try:
         statement = (
             select(Users).options(selectinload(Users.skills)).where(Users.id == user_id)
@@ -57,7 +59,7 @@ async def add_main_skills(session: AsyncSession, skills: GetNewSkills):
 
 # Get/Update the Skills of the user
 async def add_skill_to_user_by_id(
-    user_id: int, skills: List[SkillsShow], session: AsyncSession
+    user_id: str, skills: List[SkillsShow], session: AsyncSession
 ):
     try:
         new_skills = []
@@ -87,7 +89,7 @@ async def get_user_details_by_name_skill_year(
     year: int,
     session: AsyncSession,
     name: str,
-    user_id: str,
+    user_id: UUID,
 ):
     try:
         statement = (
@@ -107,7 +109,7 @@ async def get_user_details_by_name_skill_year(
         raise HTTPException(status_code=499, detail=str(e))
 
 
-async def get_unadded_skills(session: AsyncSession, user_id: int, skill: str):
+async def get_unadded_skills(session: AsyncSession, user_id: UUID, skill: str):
     try:
         subquery = (
             select(UserSkillLink.skill_id)

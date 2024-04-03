@@ -1,4 +1,4 @@
-from uuid import uuid4
+from uuid import uuid4, UUID
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlmodel import select  # pylint: disable=C0412
@@ -8,7 +8,7 @@ from redis.asyncio import Redis
 
 from app.celery_worker import send_otp
 from app import messages
-from app.models import UserCreate, Users, UserURIUpdate, LoginUser
+from app.models import UserCreate, Users, UserURIUpdate, LoginUser, Forum
 from app.core.security import hash_password, check_password, create_access_token
 from app.core.settings import settings
 
@@ -31,10 +31,11 @@ async def login_user(user_details: LoginUser, session: AsyncSession, r_conn: Red
 
         raise ValueError("Invalid Username/ Password")
     except Exception as e:
+        # print("e")
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"{e}")
 
 
-async def logout_user(user_id: int, r_conn: Redis):
+async def logout_user(user_id: UUID, r_conn: Redis):
     try:
         await r_conn.delete(f"access_token:{user_id}")
         return "User Logout Successfully"
@@ -58,7 +59,9 @@ async def create_user(user_details: UserCreate, session: AsyncSession, r_conn: R
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"{e}")
 
 
-async def update_user(user_id: int, user_details: UserURIUpdate, session: AsyncSession):
+async def update_user(
+    user_id: UUID, user_details: UserURIUpdate, session: AsyncSession
+):
     try:
         user = await session.get(Users, user_id)
         user_data = user_details.model_dump(exclude_unset=True)
@@ -74,10 +77,13 @@ async def update_user(user_id: int, user_details: UserURIUpdate, session: AsyncS
         )
 
 
-async def show_user_profile(user_id: int, session: AsyncSession):
+async def show_user_profile(user_id: UUID, session: AsyncSession):
     try:
         statement = (
-            select(Users).options(selectinload(Users.skills)).where(Users.id == user_id)
+            select(Users)
+            .options(selectinload(Users.forums))
+            .options(selectinload(Users.skills))
+            .where(Users.id == user_id)
         )
         user = (await session.exec(statement)).one_or_none()
         if user:

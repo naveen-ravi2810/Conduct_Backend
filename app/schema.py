@@ -8,6 +8,8 @@ Data validations like
 - NewPasswordSchema
 """
 
+from uuid import UUID
+
 from pydantic import BaseModel
 
 
@@ -37,7 +39,7 @@ class TokenResponse(BaseModel):
     email: str
     """
 
-    id: str
+    id: UUID
     email: str
 
 
@@ -49,7 +51,7 @@ class TokenDetailsResponse(BaseModel):
     message: str
     """
 
-    id: str
+    id: UUID
     email: str
     status: bool = True
     message: str

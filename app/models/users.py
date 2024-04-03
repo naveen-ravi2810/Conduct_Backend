@@ -1,41 +1,11 @@
-"""
-Models file for DB
-"""
+from typing import Optional, List
+from uuid import UUID
 
-# pylint: disable= W1401,R0903, E0401
-from datetime import datetime
-from typing import List, Optional
-from uuid_extensions import uuid7
 from sqlmodel import SQLModel, Field, Relationship
-
-
-# For BaseUUID
-class BaseUUID(SQLModel):
-    """
-    id: int = Field(primary_key=True)
-    created_on: datetime = Field(default_factory=datetime.now)
-    """
-
-    id: str = Field(primary_key=True, default=str(uuid7()))
-    created_at: datetime = Field(default_factory=datetime.now)
-    updated_at: datetime = Field(
-        default_factory=datetime.now, sa_column_kwargs={"onupdate": datetime.now()}
-    )
-
-
-# User and Skill Link
-class UserSkillLink(SQLModel, table=True):
-    """
-    skill_id: Optional[int] = Field(
-        default=None, foreign_key="skill.id", primary_key=True
-    )
-    user_id: Optional[int] = Field(
-        default=None, foreign_key="users.id", primary_key=True
-    )
-    """
-
-    skill_id: int = Field(foreign_key="skill.id", primary_key=True)
-    user_id: str = Field(foreign_key="users.id", primary_key=True)
+from app.models.BaseUUID import BaseUUID
+from app.models.userskills import UserSkillLink
+from app.models.skills import Skill
+from app.models.forum import Forum
 
 
 # Login User Details
@@ -127,6 +97,7 @@ class Users(BaseUUID, UserBasicCreate, table=True):
     skills: List["Skill"] = Relationship(
         back_populates="users", link_model=UserSkillLink
     )
+    forums: List["Forum"] = Relationship(back_populates="user")
 
 
 # Update user Details
@@ -172,23 +143,7 @@ class ShowUserProfile(BaseUUID, UserURIUpdate):
     phone: str
     email: str
     year: int
-
-
-# Existing Skills Details
-class Skill(SQLModel, table=True):
-    """
-    id: int = Field(primary_key=True)
-    skill: str = Field(unique=True, index=True)
-    users: List["Users"] = Relationship(
-        back_populates="skills", link_model=UserSkillLink
-    )
-    """
-
-    id: int = Field(primary_key=True)
-    skill: str = Field(unique=True, index=True)
-    users: List["Users"] = Relationship(
-        back_populates="skills", link_model=UserSkillLink
-    )
+    forums: List["Forum"]
 
 
 class ReadPeopleBySkill(SQLModel):
@@ -198,32 +153,7 @@ class ReadPeopleBySkill(SQLModel):
     skills: List[Skill]
     """
 
-    id: str
+    id: UUID
     name: str
     year: int
-    skills: List[Skill]
-
-
-# Add Skill
-class SkillsShow(SQLModel):
-    """
-    id: int
-    skill: str
-    """
-
-    id: int
-    skill: str
-
-
-class GetNewSkills(SQLModel):
-    """
-    Get only skills as a string list\n
-    ['Python','C++',]
-    """
-
-    skill: List[str]
-
-    class Config:
-        json_schema_extra = {
-            "example": {"skill": ["Python", "FastAPI", "Flask", "Djangio"]}
-        }
+    skills: List["Skill"]

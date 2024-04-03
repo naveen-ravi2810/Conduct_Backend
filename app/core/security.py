@@ -1,4 +1,5 @@
 from datetime import timedelta, datetime
+from uuid import UUID
 
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import jwt
@@ -21,12 +22,12 @@ def check_password(password: str, hashed_password: str):
     )
 
 
-async def create_access_token(id: str, email: str):
+async def create_access_token(id: UUID, email: str):
     ist = timezone("Asia/Kolkata")
     iat = datetime.now(ist)
     exp = iat + timedelta(seconds=settings.JWT_EXPIRE_TIME_IN_SEC)
     return jwt.encode(
-        {"sub": id, "email": email, "exp": exp, "iat": iat},
+        {"sub": str(id), "email": email, "exp": exp, "iat": iat},
         settings.JWT_SECRET_KEY,
         settings.JWT_ALGORITHM,
     )
@@ -57,7 +58,7 @@ async def get_user_credentials(
         if r_token:
             exist_token = r_token.decode("utf-8")
             if exist_token == token.credentials:
-                return TokenResponse(email=data["email"], id=data["sub"])
+                return TokenResponse(email=data["email"], id=UUID(data["sub"]))
             raise ValueError("Old/ Invalid Token")
         raise ValueError("Expired Token")
     except Exception as e:
