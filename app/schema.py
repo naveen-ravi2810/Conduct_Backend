@@ -8,6 +8,7 @@ Data validations like
 - NewPasswordSchema
 """
 
+from enum import Enum
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -79,3 +80,9 @@ class NewPasswordSchema(BaseModel):
     otp: str
     new_password: str
     re_enter_new_password: str
+
+
+class ReadReactionInput(Enum):
+    UP = "UP"
+    DOWN = "DOWN"
+    NONE = "NONE"
