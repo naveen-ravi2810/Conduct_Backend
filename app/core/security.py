@@ -1,11 +1,12 @@
 from datetime import timedelta, datetime
+from typing import Annotated
 from uuid import UUID
 
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import jwt
 import bcrypt
 from pytz import timezone
-from fastapi import Depends, HTTPException  # pylint: disable=C0412
+from fastapi import Depends, HTTPException, Cookie  # pylint: disable=C0412
 
 from app.core.db import r_conn
 from app.core.settings import settings
@@ -46,11 +47,13 @@ auth_schema = HTTPBearer()
 
 async def get_user_credentials(
     token: HTTPAuthorizationCredentials = Depends(auth_schema),
+    token_cook: Annotated[str | None, Cookie()] = None,
 ) -> TokenResponse:
     """
     Return only the ID of the user by the token
     """
     try:
+        print(token_cook)
         data = await decode_token(token.credentials)
         if not data:
             raise ValueError("Invalid Token")

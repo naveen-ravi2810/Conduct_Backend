@@ -86,6 +86,7 @@ class Users(BaseUUID, UserBasicCreate, table=True):
     skills: List["Skill"] = Relationship(
         back_populates="users", link_model=UserSkillLink
     )
+    forums: List["Forum"] = Relationship(back_populates="user")
     """
 
     github_uri: Optional[str] = Field(default=None)

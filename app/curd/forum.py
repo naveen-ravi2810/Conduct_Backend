@@ -1,15 +1,17 @@
+from typing import List, Sequence
 from uuid import UUID
 from sqlmodel import select
 from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from sqlmodel.ext.asyncio.session import AsyncSession
-from app.models import ForumCreate, Forum, Forum_reaction
+from app.models import ForumCreate, Forum, Forum_reaction, ReadForum
+from app.models import Users
 from app.schema import ReadReactionInput
 from sqlalchemy.orm import selectinload
 
 
 async def add_comment_by_user_id(
-        user_id: UUID, forum: ForumCreate, session: AsyncSession
+    user_id: UUID, forum: ForumCreate, session: AsyncSession
 ):
     try:
         if forum.parent_comment_id is None and forum.Category is None:
@@ -48,24 +50,42 @@ async def get_comment_by_comment_id(comment_id: UUID | None, session: AsyncSessi
         comment = (await session.exec(statement)).one_or_none()
         if comment is None:
             raise ValueError("No comment found")
-        statement = (select(Forum).where(Forum.parent_comment_id == comment.id))
+        statement = select(Forum).where(Forum.parent_comment_id == comment.id)
         sub_comment = (await session.exec(statement)).fetchall()
-        return {'Parent':comment, "child":sub_comment}
+        return {"Parent": comment, "child": sub_comment}
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-async def get_every_comments_without_id(session: AsyncSession):
+async def get_every_comments_without_id(session: AsyncSession, user_id: UUID):
     try:
         statement = (
             select(Forum)
             .options(selectinload(Forum.user))
             .where(Forum.parent_comment_id == None)
+            .order_by(Forum.created_at)
         )
         comments = (await session.exec(statement)).fetchall()
-        if comments is None:
-            raise ValueError("No comment found")
-        return comments
+        if not comments:
+            raise ValueError("No comments found")
+        resp = []
+        for comment in comments:
+            print(comment, "\n")
+            resp.append(
+                {
+                    "id": comment.id,
+                    "comment": comment.comment,
+                    "likes": comment.likes_count,
+                    "dislikes": comment.dislike_count,
+                    "user_name": comment.user.name,
+                    "user_id": comment.user.id,
+                    "date_time": comment.created_at,
+                    "sub_comments": comment.sub_comment,
+                    "type": comment.Category,
+                    # "user_reaction": "Like" if comment.reaction_type == 1 else "Dislike" if comment.reaction_type == 0 else None
+                }
+            )
+        return resp
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
@@ -85,10 +105,10 @@ async def get_sub_comment_by_comment_id(comment_id: UUID | None, session: AsyncS
 
 
 async def patch_react_to_the_comment_by_id(
-        vote_state: ReadReactionInput,
-        user_id: UUID,
-        session: AsyncSession,
-        comment_id: UUID,
+    vote_state: ReadReactionInput,
+    user_id: UUID,
+    session: AsyncSession,
+    comment_id: UUID,
 ):
     try:
         statement = select(Forum).where(Forum.id == comment_id)
@@ -105,31 +125,27 @@ async def patch_react_to_the_comment_by_id(
             # If past Reaction is Dislike
             if past_reaction == 0:
                 if vote_state.value == "DOWN":
-                    pass
+                    comment.dislike_count -= 1
+                    await session.delete(comment_reaction)
+                    await session.commit()
                 elif vote_state.value == "UP":
                     comment.dislike_count -= 1
                     comment.likes_count += 1
                     comment_reaction.reaction = 1
                     session.add(comment_reaction)
-                elif vote_state.value == "NONE":
-                    comment.dislike_count -= 1
-                    await session.delete(comment_reaction)
-                    await session.commit()
                 else:
                     raise ValueError("Invalid Reaction")
             # If past Reaction is Like
             elif past_reaction == 1:
                 if vote_state.value == "UP":
-                    pass
+                    comment.likes_count -= 1
+                    await session.delete(comment_reaction)
+                    await session.commit()
                 elif vote_state.value == "DOWN":
                     comment.dislike_count += 1
                     comment.likes_count -= 1
                     comment_reaction.reaction = 0
                     session.add(comment_reaction)
-                elif vote_state.value == "NONE":
-                    comment.likes_count -= 1
-                    await session.delete(comment_reaction)
-                    await session.commit()
                 else:
                     raise ValueError("Invalid Reaction")
             await session.commit()
@@ -139,7 +155,6 @@ async def patch_react_to_the_comment_by_id(
             new_reaction.user_id = user_id
             new_reaction.forum_id = comment_id
             if vote_state.value == "UP":
-
                 comment.likes_count += 1
                 new_reaction.reaction = 1
             elif vote_state.value == "DOWN":

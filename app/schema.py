@@ -85,4 +85,3 @@ class NewPasswordSchema(BaseModel):
 class ReadReactionInput(Enum):
     UP = "UP"
     DOWN = "DOWN"
-    NONE = "NONE"
