@@ -40,22 +40,7 @@ async def get_existing_skills(session: AsyncSession, skill_query: str):
         return skills_count
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"{e}")
-
-
-# This is only handled by the admin to add the skills
-async def add_main_skills(session: AsyncSession, skills: GetNewSkills):
-    try:
-        for skill in skills:
-            statement = select(Skill).where(Skill.skill == skill)
-            out = (await session.exec(statement=statement)).one_or_none()
-            if not out:
-                new_skill = Skill(skill=skill)
-                session.add(new_skill)
-                await session.commit()
-        return "Skills added Successfully"
-    except Exception as e:
-        raise HTTPException(status_code=499, detail=f"{e}")
-
+        
 
 # Get/Update the Skills of the user
 async def add_skill_to_user_by_id(

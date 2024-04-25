@@ -4,7 +4,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.core.settings import settings
 
-engine: AsyncEngine = create_async_engine(settings.TEST_DB_URI)
+engine: AsyncEngine = create_async_engine(settings.DB_URI)
 
 
 async_session = async_sessionmaker(

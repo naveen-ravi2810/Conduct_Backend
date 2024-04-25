@@ -1,5 +1,9 @@
-from app.curd.skills import add_main_skills
-from app.core.db import async_session
+from app.core.db import async_session, engine
+from sqlmodel.ext.asyncio.session import AsyncSession
+from app.models.users import Users
+from app.models.skills import GetNewSkills, Skill
+from sqlmodel import select
+from fastapi import HTTPException
 
 
 additional_skills = [
@@ -227,6 +231,21 @@ for i in additional_skills:
     else:
         original_final.append(i)
         hm[i] = 1
+
+
+# This is only handled by the admin to add the skills
+async def add_main_skills(session: AsyncSession, skills: GetNewSkills):
+    try:
+        for skill in skills:
+            statement = select(Skill).where(Skill.skill == skill)
+            out = (await session.exec(statement=statement)).one_or_none()
+            if not out:
+                new_skill = Skill(skill=skill)
+                session.add(new_skill)
+                await session.commit()
+        return "Skills added Successfully"
+    except Exception as e:
+        raise HTTPException(status_code=499, detail=f"{e}")
 
 
 async def init_db_fun():

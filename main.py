@@ -4,6 +4,7 @@ Main file to run application
 
 import time
 import logging
+import asyncio
 from fastapi import FastAPI, Request
 from fastapi_pagination import add_pagination
 from fastapi_pagination.utils import disable_installed_extensions_check
@@ -11,7 +12,7 @@ from fastapi_pagination.utils import disable_installed_extensions_check
 from app.api.v1.api import api
 from app.core.settings import settings
 
-# from app.core.init_db import init_db_fun
+from app.core.init_db import init_db_fun
 
 
 app = FastAPI(
@@ -54,19 +55,11 @@ async def add_log(request: Request, call_next):
     return response
 
 
-@app.on_event("startup")
-async def app_startup_event():
-    """
-    startup event
-    """
-    # await init_db_fun()
-
-
-@app.on_event("shutdown")
-async def app_shutdown_event():
-    """
-    shutdown event
-    """
-
-
 app.include_router(api)
+
+
+if __name__ == "__main__":
+    asyncio.run(init_db_fun())
+    import uvicorn
+    uvicorn.run("main:app", host='0.0.0.0', port=8000, reload=True)
+
