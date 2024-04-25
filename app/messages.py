@@ -10,7 +10,7 @@ USER_CANNOT_UPDATED_SUCCESSFULLY = "user cannot successfully"
 
 PROJECT_NAME = "Conduct"
 PROJECT_DESRIPTION = """This application is build for the college
-students to connect their <br/> non class friends to improve their knowledge"""
+students to connect their <br/> other class friends to improve their knowledge"""
 PROJECT_VERSION = "1.0.0"
 PROJECT_OWNER_URL = "https://naveenravi.onrender.com"
 PROJECT_OWNER_EMAIL = "naveen.cravi@gmail.com"

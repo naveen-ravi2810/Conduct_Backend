@@ -47,13 +47,11 @@ auth_schema = HTTPBearer()
 
 async def get_user_credentials(
     token: HTTPAuthorizationCredentials = Depends(auth_schema),
-    token_cook: Annotated[str | None, Cookie()] = None,
 ) -> TokenResponse:
     """
     Return only the ID of the user by the token
     """
     try:
-        print(token_cook)
         data = await decode_token(token.credentials)
         if not data:
             raise ValueError("Invalid Token")

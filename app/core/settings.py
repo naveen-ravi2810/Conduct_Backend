@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     PROJECT_ENDPOINT_VERSION: str = "/api/v1"
 
     DB_URI: str = os.environ.get("POSTGRESQL_URI")
+    TEST_DB_URI: str = os.environ.get("TEST_POSTGRESQL_URI")
 
     REDIS_HOST: str = os.environ.get("REDIS_HOST")
     REDIS_USERNAME: str = os.environ.get("REDIS_USER_NAME")

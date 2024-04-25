@@ -3,7 +3,7 @@ install:
 	pip install poetry && poetry update
 alembic:
 	# make alembic
-	alembic upgrade head
+	poetry run alembic upgrade head
 format:
 	# make format
 	ruff format
@@ -18,6 +18,6 @@ start:
 	uvicorn main:app --host=0.0.0.0 --port=8000
 debug:
 	# make debug
-	uvicorn main:app --host=0.0.0.0 --port=8000 --reload
+	poetry run uvicorn main:app --host=0.0.0.0 --port=8000 --reload
 
 all : install format lint test start

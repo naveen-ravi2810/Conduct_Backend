@@ -11,7 +11,7 @@ from fastapi_pagination.utils import disable_installed_extensions_check
 from app.api.v1.api import api
 from app.core.settings import settings
 
-from app.core.init_db import init_db_fun
+# from app.core.init_db import init_db_fun
 
 
 app = FastAPI(
@@ -59,7 +59,7 @@ async def app_startup_event():
     """
     startup event
     """
-    await init_db_fun()
+    # await init_db_fun()
 
 
 @app.on_event("shutdown")
