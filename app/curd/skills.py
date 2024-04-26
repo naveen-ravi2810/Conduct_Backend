@@ -40,7 +40,7 @@ async def get_existing_skills(session: AsyncSession, skill_query: str):
         return skills_count
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"{e}")
-        
+
 
 # Get/Update the Skills of the user
 async def add_skill_to_user_by_id(
