@@ -1,42 +1,23 @@
-# from httpx import AsyncClient
-# import pytest
-
-# from app.core.settings import settings
-
-
-# @pytest.mark.asyncio
-# async def test_login(async_client: AsyncClient, get_header):
-#     response = await async_client.get(
-#         f"{settings.PROJECT_ENDPOINT_VERSION}/profile/b70eab2b-4ed2-4778-a987-e9336d4d07ab",
-#         headers=get_header
-#     )
-#     print(response.json())
-#     assert response.status_code == 200
-#     print(response.json())
-
 from httpx import AsyncClient
 from app.core.settings import settings
+from main import app
 import pytest
 
-# @pytest.mark.anyio
-# async def test_login(async_client: AsyncClient):
-#     r = await async_client.post(
-#         f"{settings.PROJECT_ENDPOINT_VERSION}/login",
-#         json={"email": "naveen.r2021eceb@sece.ac.in", "password": "test@1234"},
-#     )
-#     response = r.json()
-#     # user_token = response["access_token"]
-#     # yield {"Authorization": f"Bearer {user_token}"}
-#     print(r.json())
-#     assert r.status_code == 200
 
-def test_login(client):
-    r = client.post(
-        f"{settings.PROJECT_ENDPOINT_VERSION}/login",
-        json={"email": "naveen.r2021eceb@sece.ac.in", "password": "test@1234"},
-    )
-    response = r.json()
-    # user_token = response["access_token"]
-    # yield {"Authorization": f"Bearer {user_token}"}
-    print(r.json())
+@pytest.mark.asyncio
+async def test_health_check(async_client: AsyncClient):
+    r = await async_client.get("/health")
     assert r.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_login():
+    async with AsyncClient(app=app, base_url="http://test") as async_client:
+        r = await async_client.post(
+            f"{settings.PROJECT_ENDPOINT_VERSION}/login",
+            json={"email": "test.r2021eceb@sece.ac.in", "password": "test@1234"},
+        )
+        response = r.json()
+        print(r.json())
+        assert r.status_code == 200
+        assert 1 == 1

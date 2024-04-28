@@ -58,6 +58,11 @@ async def add_log(request: Request, call_next):
 app.include_router(api)
 
 
+@app.get("/health")
+async def health_check():
+    return {"status": True}
+
+
 if __name__ == "__main__":
     asyncio.run(init_db_fun())
     import uvicorn
