@@ -1,26 +1,9 @@
-version: "3.8"
-
 services:
 
   api:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        - POSTGRESQL_URI=${POSTGRESQL_URI}
-        - REDIS_HOST=${REDIS_HOST}
-        - REDIS_PORT=${REDIS_PORT}
-        - REDIS_PASSWORD=${REDIS_PASSWORD}
-        - REDIS_USER_NAME=${REDIS_USER_NAME}
-        - REDIS_DB=${REDIS_DB}
-        - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-        - JWT_ALGORITHM=${JWT_ALGORITHM}
-        - JWT_EXPIRE_IN_SEC=${JWT_EXPIRE_IN_SEC}
-        - DOMAIN_EMAIL=${DOMAIN_EMAIL}
-        - EMAIL_PASSWORD=${EMAIL_PASSWORD}
-        - EMAIL_EMAIL=${EMAIL_EMAIL}
-        - CELERY_BACKEND=${CELERY_BACKEND}
-        - CELERY_BROKER=${CELERY_BROKER}
     container_name: app
     command: bash -c "poetry run alembic upgrade head && poetry run uvicorn main:app --host=0.0.0.0 --port=8000"
     restart: always
@@ -72,19 +55,19 @@ services:
       - api
 
 
-  flower:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: flower
-    command: "poetry run celery -A app.celery_worker flower -l info --port=5555"
-    restart: always
-    depends_on:
-      - redis
-      - worker
-      - api
-    ports:
-      - "5555:5555"
+  # flower:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: flower
+  #   command: "poetry run celery -A app.celery_worker flower -l info --port=5555"
+  #   restart: always
+  #   depends_on:
+  #     - redis
+  #     - worker
+  #     - api
+  #   ports:
+  #     - "5555:5555"
 
 
 volumes:
