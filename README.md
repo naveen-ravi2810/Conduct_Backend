@@ -65,3 +65,13 @@ and read the docs at
 ## End 
 
 1. Written an article and hosted in onrender.com <a href='https://naveenraviblogs.onrender.com/' target='_blank'>Link</a>. 
+
+
+## What can be contributed
+
+1. Can add test for remaing endpoints
+2. add /profile_image adding endpoint
+3. Can create rate limiter for the application endpoints
+4. Micro services for new services also can be done
+5. Can make CI/CD pipelines if possible
+6. Write proper Docker compose and docker file file passing without the .env for building image

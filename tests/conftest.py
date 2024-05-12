@@ -2,6 +2,7 @@
 
 import asyncio
 import pytest
+from uuid import uuid4
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncEngine
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -55,8 +56,12 @@ async def create_tables():
         await conn.run_sync(SQLModel.metadata.drop_all)
         await conn.run_sync(SQLModel.metadata.create_all)
     async with async_session_maker() as session:
-        new_user_1 = Users(**new_user_data_1)
-        new_user_2 = Users(**new_user_data_2)
+        id_1 = uuid4()
+        id_2 = uuid4()
+        pytest.id_1 = id_1
+        pytest.id_2 = id_2
+        new_user_1 = Users(**new_user_data_1, id=id_1)
+        new_user_2 = Users(**new_user_data_2, id=id_2)
         session.add(new_user_1)
         session.add(new_user_2)
         await session.commit()

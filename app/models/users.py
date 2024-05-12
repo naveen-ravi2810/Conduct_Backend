@@ -64,7 +64,7 @@ class UserCreate(UserBasicCreate):
                 "password": "Your_strong_password",
                 "email": "naveen.r2021eceb@sece.ac.in",
                 "year": "2025",
-                "otp": 123456,
+                "otp": "123456",
             }
         }
 

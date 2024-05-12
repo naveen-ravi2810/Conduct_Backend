@@ -269,3 +269,11 @@ new_user_data_2 = {
     "name": "test_user_2",
     "password": hash_password("test@1234"),
 }
+
+new_user_data_3 = {
+    "email": "test.1r2021eceb@sece.ac.in",
+    "year": 2025,
+    "phone": "8903744454",
+    "name": "test_user_3",
+    "password": "test@1234",
+}
