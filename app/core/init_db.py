@@ -1,4 +1,5 @@
-from app.core.db import async_session, engine
+from app.core.db import async_session
+from app.core.security import hash_password
 from sqlmodel.ext.asyncio.session import AsyncSession
 from app.models.users import Users
 from app.models.skills import GetNewSkills, Skill
@@ -251,3 +252,20 @@ async def add_main_skills(session: AsyncSession, skills: GetNewSkills):
 async def init_db_fun():
     async with async_session() as session:
         await add_main_skills(session=session, skills=original_final)
+
+
+new_user_data_1 = {
+    "email": "test.r2021eceb@sece.ac.in",
+    "year": 2025,
+    "phone": "8903711336",
+    "name": "test_user",
+    "password": hash_password("test@1234"),
+}
+
+new_user_data_2 = {
+    "email": "test.123r2021eceb@sece.ac.in",
+    "year": 2025,
+    "phone": "8903744444",
+    "name": "test_user_2",
+    "password": hash_password("test@1234"),
+}

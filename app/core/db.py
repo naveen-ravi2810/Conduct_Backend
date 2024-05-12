@@ -18,5 +18,8 @@ async def get_session() -> AsyncSession:  # type: ignore
 
 
 r_conn = redis.Redis(
-    host=settings.REDIS_HOST, db=settings.REDIS_DB, port=settings.REDIS_PORT
+    host=settings.REDIS_HOST,
+    db=settings.REDIS_DB,
+    port=settings.REDIS_PORT,
+    # db="localhost:6379/8"
 )

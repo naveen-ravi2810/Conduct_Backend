@@ -6,7 +6,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import jwt
 import bcrypt
 from pytz import timezone
-from fastapi import Depends, HTTPException, Cookie  # pylint: disable=C0412
+from fastapi import Depends, HTTPException  # pylint: disable=C0412
 
 from app.core.db import r_conn
 from app.core.settings import settings

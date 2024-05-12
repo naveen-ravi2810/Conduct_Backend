@@ -1,6 +1,5 @@
 """Conftest for the application"""
 
-from typing import Generator
 import asyncio
 import pytest
 from httpx import AsyncClient
@@ -9,6 +8,12 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 import pytest_asyncio
 
 from main import app
+from app.core.init_db import (
+    add_main_skills,
+    original_final,
+    new_user_data_1,
+    new_user_data_2,
+)
 from app.core.settings import settings
 from app.core.db import get_session
 from app.core.security import hash_password
@@ -23,36 +28,23 @@ async_session_maker = async_sessionmaker(
 )
 
 
-# yielding session
-async def override_get_session() -> AsyncSession:
+# # yielding session
+async def override_get_session() -> AsyncSession:  # type: ignore
     async with async_session_maker() as session:
         yield session
 
 
-# Dependency_overriding
+# # Dependency_overriding
 app.dependency_overrides[get_session] = override_get_session
 
 
 # Test data loading
-new_user_data = {
-    "email": "test.r2021eceb@sece.ac.in",
-    "year": 2025,
-    "phone": "8903711336",
-    "name": "test_user",
-    "password": hash_password("test@1234"),
-}
 
 
 # Event loop to avoid Future pending error
 @pytest.fixture(scope="session")
 def event_loop():
-    """Create an instance of the default event loop for each test case."""
-    res = asyncio.new_event_loop()
-    asyncio.set_event_loop(res)
-    res._close = res.close
-    res.close = lambda: None
-    yield res
-    res._close()
+    return asyncio.get_event_loop()
 
 
 # making tables and inserting sample data with order1
@@ -63,13 +55,13 @@ async def create_tables():
         await conn.run_sync(SQLModel.metadata.drop_all)
         await conn.run_sync(SQLModel.metadata.create_all)
     async with async_session_maker() as session:
-        new_user = Users(**new_user_data)
-        session.add(new_user)
+        new_user_1 = Users(**new_user_data_1)
+        new_user_2 = Users(**new_user_data_2)
+        session.add(new_user_1)
+        session.add(new_user_2)
         await session.commit()
+        await add_main_skills(session=session, skills=original_final)
         yield
-        await asyncio.sleep(5)
-        await session.delete(new_user)
-        await session.commit()
     async with engine_test.begin() as conn:
         await conn.run_sync(SQLModel.metadata.drop_all)
 

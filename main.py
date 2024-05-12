@@ -66,5 +66,7 @@ async def health_check():
 if __name__ == "__main__":
     asyncio.run(init_db_fun())
     import uvicorn
+    from app.core.db import settings
 
+    print(settings.CELERY_BACKEND)
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
