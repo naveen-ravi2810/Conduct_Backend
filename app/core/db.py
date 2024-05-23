@@ -17,9 +17,16 @@ async def get_session() -> AsyncSession:  # type: ignore
         yield session
 
 
+# Connecting redis for auth_token and email_verification
 r_conn = redis.Redis(
     host=settings.REDIS_HOST,
     db=settings.REDIS_DB,
     port=settings.REDIS_PORT,
-    # db="localhost:6379/8"
+)
+
+# Connecction redis for ratelimiter purpose
+r_conn_rate_limiter = redis.Redis(
+    host=settings.REDIS_HOST,
+    db=settings.REDIS_DB_RATE_LIMITER,
+    port=settings.REDIS_PORT,
 )

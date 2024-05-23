@@ -22,6 +22,7 @@ def send_otp(email: str, otp: str):
     celery task to send email for verification
     """
     try:
+        print("Hello world")
         send_email(email, otp)
     except Exception as e:  # pylint: disable=W0718
         logger.exception("Failed to send OTP email to %s: %s", email, e)

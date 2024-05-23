@@ -62,6 +62,7 @@ async def get_every_comments_without_id(session: AsyncSession, user_id: UUID):
         statement = (
             select(Forum)
             .options(selectinload(Forum.user))
+            .options(selectinload(Forum.forum_reaction))
             .where(Forum.parent_comment_id == None)
             .order_by(Forum.created_at)
         )
@@ -70,7 +71,6 @@ async def get_every_comments_without_id(session: AsyncSession, user_id: UUID):
             raise ValueError("No comments found")
         resp = []
         for comment in comments:
-            print(comment, "\n")
             resp.append(
                 {
                     "id": comment.id,
@@ -82,7 +82,7 @@ async def get_every_comments_without_id(session: AsyncSession, user_id: UUID):
                     "date_time": comment.created_at,
                     "sub_comments": comment.sub_comment,
                     "type": comment.Category,
-                    # "user_reaction": "Like" if comment.reaction_type == 1 else "Dislike" if comment.reaction_type == 0 else None
+                    "user_reaction": comment.forum_reaction,
                 }
             )
         return resp
@@ -115,10 +115,12 @@ async def patch_react_to_the_comment_by_id(
         comment = (await session.exec(statement)).one_or_none()
         if not comment:
             raise ValueError("No comment in this ID found")
-        statement = select(Forum_reaction).where(
-            Forum_reaction.forum_id == comment_id and Forum_reaction.user_id == user_id
+        statement_1 = (
+            select(Forum_reaction)
+            .where(Forum_reaction.forum_id == comment_id)
+            .where(Forum_reaction.user_id == user_id)
         )
-        comment_reaction = (await session.exec(statement)).one_or_none()
+        comment_reaction = (await session.exec(statement_1)).one_or_none()
         # Runs when the comment reaction is already exists
         if comment_reaction:
             past_reaction = comment_reaction.reaction

@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Optional, TYPE_CHECKING
+from typing import List, Optional, TYPE_CHECKING
 from uuid import UUID
 
 from sqlmodel import SQLModel, Field, Relationship
@@ -30,7 +30,7 @@ class Forum(ForumCreate, BaseUUID, table=True):
     dislike_count: int = Field(default=0, ge=0)
     sub_comment: int = Field(default=0, ge=0)
     user: "Users" = Relationship(back_populates="forums")
-    forum_reaction: "Forum_reaction" = Relationship(back_populates="forums")
+    forum_reaction: List["Forum_reaction"] = Relationship(back_populates="forums")
 
 
 class ReadForum(SQLModel):

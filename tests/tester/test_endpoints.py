@@ -1,8 +1,9 @@
 from httpx import AsyncClient
 from app.core.settings import settings
 from app.core.init_db import new_user_data_1, new_user_data_3, new_user_data_2
-from app.core.db import r_conn
+from app.core.db import r_conn, r_conn_rate_limiter
 import pytest
+from fastapi import status
 
 
 async def test_health_check(async_client: AsyncClient):
@@ -123,3 +124,12 @@ async def test_logout(async_client: AsyncClient):
     response = r.json()
     assert response["status"] == "ok"
     assert response["message"] == "User Logout Successfully"
+
+
+# Testing the working of rate limiter
+async def test_throw_a_429(async_client: AsyncClient):
+    for i in range(0, settings.MAX_REQUEST_RATE_LIMTER):
+        r = await async_client.get(f"{settings.PROJECT_ENDPOINT_VERSION}/health_check")
+    r = await async_client.get(f"{settings.PROJECT_ENDPOINT_VERSION}/health_check")
+    assert r.status_code == status.HTTP_429_TOO_MANY_REQUESTS
+    await r_conn_rate_limiter.delete("127.0.0.1")

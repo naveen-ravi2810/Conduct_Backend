@@ -35,6 +35,11 @@ class Settings(BaseSettings):
     REDIS_PORT: int = os.environ.get("REDIS_PORT")
     REDIS_DB: int = os.environ.get("REDIS_DB")
 
+    # Used only for rate limiter purposes
+    REDIS_DB_RATE_LIMITER: int = os.environ.get("REDIS_DB_RATE_LIMITER")
+    MAX_REQUEST_RATE_LIMTER: int = 40
+    RATE_LIMITER_MAX_TIME_IN_SEC: int = 120
+
     JWT_SECRET_KEY: str = os.environ.get("JWT_SECRET_KEY")
     JWT_ALGORITHM: str = os.environ.get("JWT_ALGORITHM")
     JWT_EXPIRE_TIME_IN_SEC: int = os.environ.get("JWT_EXPIRE_IN_SEC")

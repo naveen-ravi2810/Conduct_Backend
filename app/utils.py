@@ -6,6 +6,7 @@ utils folder contain
 
 import smtplib
 from pathlib import Path
+from fastapi import HTTPException, status
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -64,3 +65,21 @@ def send_email_for_forgot_password(email: str, otp: str) -> None:
         server.starttls()
         server.login(sender_email, sender_password)
         server.sendmail(sender_email, email, msg.as_string())
+
+
+from app.core.db import r_conn_rate_limiter
+
+
+# Basic implementation of rate_limiter with redis_db
+async def get_rate_limiter_status(ip: str):
+    previous_count = await r_conn_rate_limiter.get(ip)
+    if previous_count is None:
+        await r_conn_rate_limiter.setex(
+            name=ip, time=settings.RATE_LIMITER_MAX_TIME_IN_SEC, value=1
+        )
+    elif int(previous_count.decode("utf-8")) >= settings.MAX_REQUEST_RATE_LIMTER:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="too many requests"
+        )
+    else:
+        await r_conn_rate_limiter.incr(ip)
