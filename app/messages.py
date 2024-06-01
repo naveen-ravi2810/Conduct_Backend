@@ -1,7 +1,6 @@
 """
 Contains some message for need coding
 """
-
 USER_CREATED_MESSAGE = "user created successfully"
 USER_ALREADY_EXISTED = "user already existed"
 USER_UPDATED_SUCCESSFULLY = "user updated successfully"

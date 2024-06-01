@@ -1,5 +1,6 @@
 from typing import List, Sequence
 from uuid import UUID
+from sqlalchemy import exists
 from sqlmodel import select
 from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
@@ -59,6 +60,13 @@ async def get_comment_by_comment_id(comment_id: UUID | None, session: AsyncSessi
 
 async def get_every_comments_without_id(session: AsyncSession, user_id: UUID):
     try:
+        # Fetch all reactions of the current user
+        user_reactions = (
+            await session.execute(
+                select(Forum_reaction).where(Forum_reaction.user_id == user_id)
+            )
+        ).scalars().all()
+
         statement = (
             select(Forum)
             .options(selectinload(Forum.user))
@@ -71,6 +79,11 @@ async def get_every_comments_without_id(session: AsyncSession, user_id: UUID):
             raise ValueError("No comments found")
         resp = []
         for comment in comments:
+            # Check if the current user has reacted to this comment
+            liked_by_current_user = any(
+                reaction.forum_id == comment.id for reaction in user_reactions
+            )
+
             resp.append(
                 {
                     "id": comment.id,
@@ -83,13 +96,12 @@ async def get_every_comments_without_id(session: AsyncSession, user_id: UUID):
                     "sub_comments": comment.sub_comment,
                     "type": comment.Category,
                     "user_reaction": comment.forum_reaction,
+                    "liked_by_current_user": liked_by_current_user,
                 }
             )
         return resp
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-
-
 async def get_sub_comment_by_comment_id(comment_id: UUID | None, session: AsyncSession):
     try:
         statement = (

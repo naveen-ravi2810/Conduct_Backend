@@ -1,13 +1,12 @@
-"""
-Main file to run application
+""" Main file to run application
 """
 
 import time
-import logging
-import asyncio
-from fastapi import FastAPI, Request, status
+import logging 
+import asyncio 
+from fastapi import FastAPI, Request, status 
 from fastapi.responses import JSONResponse
-from fastapi_pagination import add_pagination
+from fastapi_pagination import add_pagination 
 from fastapi_pagination.utils import disable_installed_extensions_check
 
 from app.api.v1.api import api

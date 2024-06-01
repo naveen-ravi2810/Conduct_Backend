@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, status, UploadFile, HTTPException, Response
+from fastapi import APIRouter, Depends, status, UploadFile, HTTPException
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.models import UserCreate, UserURIUpdate, LoginUser, ShowUserProfile
@@ -58,14 +58,12 @@ async def get_user_updates_uri_by_id(
     "/login", status_code=status.HTTP_200_OK, response_model=LoginResponseSchema
 )
 async def login_user_by_credentials(
-    response: Response,
     user_details: LoginUser,
     session: AsyncSession = Depends(get_session),
 ):
     access_token = await login_user(
         user_details=user_details, session=session, r_conn=r_conn
     )
-    response.set_cookie(key="token", value=access_token)
     return LoginResponseSchema(access_token=access_token)
 
 
@@ -74,10 +72,8 @@ async def login_user_by_credentials(
     "/logout", status_code=status.HTTP_200_OK, response_model=BaseStatusResponse
 )
 async def logout_user_by_token(
-    response: Response,
     token_details: TokenResponse = Depends(get_user_credentials),
 ):
-    response.delete_cookie("token_cook")
     return BaseStatusResponse(
         message=await logout_user(user_id=token_details.id, r_conn=r_conn)
     )
